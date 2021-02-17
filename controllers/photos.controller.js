@@ -22,15 +22,17 @@ exports.add = async (req, res) => {
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
 
-      mailformat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-      if(email.match(mailformat)) {
+     const pattern = new RegExp(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/);
+     const emailMatch = email.match(pattern).join('')
+     if(emailMatch.length === email.length) {
+        res.json({message:'Ok'})
       } else throw Error('Wrong format. Perhaps forgot @')
       if(author.length <= 50 && title.length <= 25) {
-        const fileName = file.path.split('/').slice(-1)[0]; // cut only filename from full path, e.g. C:/test/abc.jpg -> abc.jpg
+        const fileName = file.path.split('/').slice(-1)[0];
         const extensions = ['gif', 'jpg', 'png']
       if(extensions.includes((fileName.split('.').pop()))){
         const newPhoto = new Photo({ title, author, email, src: fileName, votes: 0 });
-        await newPhoto.save(); // ...save new photo in DB
+        await newPhoto.save();
         res.json(newPhoto);
       } else {
         throw new Error('Wrong file extension!');
